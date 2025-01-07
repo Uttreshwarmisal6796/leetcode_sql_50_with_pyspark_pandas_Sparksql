@@ -54,6 +54,38 @@ sc = SparkContext(conf=conf)
 sc.setLogLevel("ERROR")
 spark = SparkSession.builder.getOrCreate()
 
+data = [
+    (1, "Will", None),
+    (2, "Jane", None),
+    (3, "Alex", 2),
+    (4, "Bill", None),
+    (5, "Zack", 1),
+    (6, "Mark", 2)
+]
+
+# Define schema for the DataFrame
+columns = ["id", "name", "referee_id"]
+
+# Create the DataFrame
+df = spark.createDataFrame(data, schema=columns)
+
+#pyspark
+df.show()
+df_fil=df.filter((col("referee_id")!=2) | (col("referee_id").isNull())).select(col("name"))
+df_fil.show()
+
+
+#sparksql
+df.createOrReplaceTempView("table")
+sql_df=spark.sql("select name from table where referee_id != 2 or referee_id is Null")
+sql_df.show()
+
+
+#pandas
+pandas_df= pd.DataFrame(data, columns=columns)
+df_filter=pandas_df[(pandas_df["referee_id"].isnull()) | (pandas_df["referee_id"]!=2)]
+print(df_filter)
+
 
 
 
